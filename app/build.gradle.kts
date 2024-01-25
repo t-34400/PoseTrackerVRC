@@ -71,4 +71,7 @@ dependencies {
 
     val nav_version = "2.7.6"
     implementation("androidx.navigation:navigation-compose:$nav_version")
+
+    val permission_version = "0.32.0"
+    implementation("com.google.accompanist:accompanist-permissions:$permission_version")
 }
