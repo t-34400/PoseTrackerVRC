@@ -74,4 +74,12 @@ dependencies {
 
     val permission_version = "0.32.0"
     implementation("com.google.accompanist:accompanist-permissions:$permission_version")
+
+    val camera_version = "1.3.1"
+    implementation("androidx.camera:camera-camera2:$camera_version")
+    implementation("androidx.camera:camera-lifecycle:$camera_version")
+    implementation("androidx.camera:camera-view:$camera_version")
+
+    val mlkit_version = "17.3.0"
+    implementation("com.google.mlkit:vision-common:$mlkit_version")
 }
