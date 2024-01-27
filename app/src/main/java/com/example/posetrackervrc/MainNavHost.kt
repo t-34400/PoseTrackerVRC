@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import android.util.Log
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
@@ -90,7 +91,7 @@ fun MainNavHost(
             )
         }
         composable(route = CameraPoseEstimationDestinationProperties.route) {
-            CameraPoseEstimationScreen()
+            CameraPoseEstimationScreen(modifier = Modifier.fillMaxSize())
         }
         composable(route = VideoPoseEstimationDestinationProperties.route) {
             VideoPoseEstimationScreen()

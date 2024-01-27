@@ -82,4 +82,8 @@ dependencies {
 
     val mlkit_version = "17.3.0"
     implementation("com.google.mlkit:vision-common:$mlkit_version")
+    val pose_detection_version = "18.0.0-beta3"
+    implementation("com.google.mlkit:pose-detection:$pose_detection_version")
+    implementation("com.google.mlkit:pose-detection-common:$pose_detection_version")
+    implementation("com.google.mlkit:pose-detection-accurate:$pose_detection_version")
 }
