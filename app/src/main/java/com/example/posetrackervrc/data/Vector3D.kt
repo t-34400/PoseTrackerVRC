@@ -8,6 +8,11 @@ data class Vector3D(val x: Float, val y: Float, val z: Float) {
         val right = Vector3D(1.0f, 0.0f, 0.0f)
         val up = Vector3D(0.0f, 1.0f, 0.0f)
         val forward = Vector3D(0.0f, 0.0f, 1.0f)
+
+        fun getRotationAxis(from: Vector3D, to: Vector3D): Vector3D {
+            val crossProduct = from.cross(to)
+            return crossProduct.normalized
+        }
     }
     val sqrMagnitude: Float get() = x * x + y * y + z * z
     val magnitude: Float get() = sqrt(sqrMagnitude)
