@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,15 +41,17 @@ fun MainScreen(
     ) {
         CardButton(
             painter = painterResource(id = R.drawable.baseline_video_camera_front_24),
-            text = "Camera Pose Estimation",
+            text = stringResource(R.string.camera_pose_estimation_button_label),
             onClick = onCameraButtonClick
         )
+        /*
         Spacer(modifier = Modifier.width(16.dp))
         CardButton(
             painter = painterResource(id = R.drawable.sharp_movie_24),
             text = "Video Pose Estimation",
             onClick = onVideoButtonClick
         )
+        */
     }
 }
 

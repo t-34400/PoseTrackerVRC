@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">PoseTrackerVRC</string>
+    <string name="camera_pose_estimation_button_label">Camera Pose Estimation</string>
 </resources>

@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.posetrackervrc.ui.theme.PoseTrackerVRCTheme
-import com.example.posetrackervrc.ui.topbar.MainTopBar
+import com.example.posetrackervrc.viewmodel.UDPViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,13 +33,14 @@ class MainActivity : ComponentActivity() {
             val destinationProperties =
                 destinationPropertiesList.find { it.route == currentDestination?.route } ?: MainDestinationProperties
             val snackbarHostState = remember { SnackbarHostState() }
+            val udpViewModel = remember { UDPViewModel() }
             Scaffold(
                 topBar = {
-                        MainTopBar(
-                            label = destinationProperties.label,
-                            showBackButton = destinationProperties != MainDestinationProperties,
-                            onBackButtonClicked = { navController.popBackStack() }
-                        )
+                         MainTopBar(
+                             properties = destinationProperties,
+                             onBackButtonClicked = { navController.popBackStack() },
+                             udpViewModel = udpViewModel
+                         )
                 },
                 snackbarHost = {
                     SnackbarHost(hostState = snackbarHostState)
