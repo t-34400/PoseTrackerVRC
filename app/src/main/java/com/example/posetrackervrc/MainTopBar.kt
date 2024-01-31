@@ -14,6 +14,8 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.example.posetrackervrc.ui.camera.CameraSettingsDialog
+import com.example.posetrackervrc.ui.camera.PoseViewModel
 import com.example.posetrackervrc.ui.main.MainSettingsDialog
 import com.example.posetrackervrc.viewmodel.UDPViewModel
 
@@ -22,6 +24,7 @@ fun MainTopBar (
     properties: DestinationProperties,
     onBackButtonClicked: (() -> Unit),
     udpViewModel: UDPViewModel,
+    poseViewModel: PoseViewModel
 ) {
 
     when (properties) {
@@ -47,8 +50,9 @@ fun MainTopBar (
                 onSettingsButtonClicked = { showSettingsDialog.value = true }
             )
             if (showSettingsDialog.value) {
-                MainSettingsDialog(
+                CameraSettingsDialog(
                     udpViewModel = udpViewModel,
+                    poseViewModel = poseViewModel,
                     onDismissRequest = { showSettingsDialog.value = false }
                 )
             }

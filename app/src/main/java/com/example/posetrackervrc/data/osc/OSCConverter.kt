@@ -1,4 +1,4 @@
-package com.example.posetrackervrc.ui.osc
+package com.example.posetrackervrc.data.osc
 
 import com.example.posetrackervrc.data.Vector3D
 import java.nio.ByteBuffer

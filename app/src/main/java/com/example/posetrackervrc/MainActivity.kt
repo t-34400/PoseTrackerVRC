@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.posetrackervrc.ui.camera.PoseViewModel
 import com.example.posetrackervrc.ui.theme.PoseTrackerVRCTheme
 import com.example.posetrackervrc.viewmodel.UDPViewModel
 
@@ -34,12 +35,14 @@ class MainActivity : ComponentActivity() {
                 destinationPropertiesList.find { it.route == currentDestination?.route } ?: MainDestinationProperties
             val snackbarHostState = remember { SnackbarHostState() }
             val udpViewModel = remember { UDPViewModel() }
+            val poseViewModel = remember { PoseViewModel() }
             Scaffold(
                 topBar = {
                          MainTopBar(
                              properties = destinationProperties,
                              onBackButtonClicked = { navController.popBackStack() },
-                             udpViewModel = udpViewModel
+                             udpViewModel = udpViewModel,
+                             poseViewModel = poseViewModel
                          )
                 },
                 snackbarHost = {
@@ -49,7 +52,9 @@ class MainActivity : ComponentActivity() {
                 MainNavHost(
                     navController = navController,
                     modifier = Modifier.padding(innerPadding),
-                    snackbarHostState = snackbarHostState
+                    snackbarHostState = snackbarHostState,
+                    udpViewModel = udpViewModel,
+                    poseViewModel = poseViewModel
                 )
             }
         }

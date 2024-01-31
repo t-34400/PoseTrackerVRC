@@ -19,7 +19,7 @@ data class Vector3D(val x: Float, val y: Float, val z: Float) {
     val normalized: Vector3D
         get() {
             val magnitude = magnitude
-            return if (magnitude == 0.0f) {
+            return if (magnitude != 0.0f) {
                 Vector3D(x / magnitude, y / magnitude, z / magnitude)
             } else {
                 zero
@@ -61,5 +61,5 @@ data class Vector3D(val x: Float, val y: Float, val z: Float) {
 }
 
 operator fun Float.times(vector: Vector3D): Vector3D {
-    return this * vector
+    return vector * this
 }

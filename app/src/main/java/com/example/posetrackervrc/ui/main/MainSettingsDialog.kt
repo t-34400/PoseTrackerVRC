@@ -17,15 +17,16 @@ fun MainSettingsDialog(
     onDismissRequest: () -> Unit,
 ) {
     val remoteAddress = remember { mutableStateOf(udpViewModel.remoteAddress) }
-    val remotePort = remember { mutableIntStateOf(udpViewModel.remotePort) }
+    val remotePort = remember { mutableStateOf(udpViewModel.remotePort.toString()) }
 
     SettingsDialog(
         modifier = modifier,
         title = "Settings",
         onDismissRequest = {
+            val port = remotePort.value.toIntOrNull() ?: udpViewModel.remotePort
             udpViewModel.updateRemoteClientInfo(
                 address = remoteAddress.value,
-                port = remotePort.intValue
+                port = port
             )
             onDismissRequest()
         }
@@ -35,11 +36,9 @@ fun MainSettingsDialog(
             onAddressChanged = { address ->
                 remoteAddress.value = address
             },
-            remotePort = remotePort.intValue.toString(),
+            remotePort = remotePort.value,
             onPortChanged = { portString ->
-                portString.toIntOrNull()?.let { port ->
-                    remotePort.intValue = port
-                }
+                remotePort.value = portString
             }
         )
     }

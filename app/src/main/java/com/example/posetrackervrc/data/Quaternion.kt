@@ -1,14 +1,20 @@
 package com.example.posetrackervrc.data
 
+import android.util.Log
+import kotlin.math.PI
 import kotlin.math.acos
+import kotlin.math.asin
 import kotlin.math.atan2
 import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 data class Quaternion(val x: Float, val y: Float, val z: Float, val w: Float) {
     companion object {
+        val identity: Quaternion = Quaternion(0f, 0f, 0f, 1f)
         fun angleAxis(angle: Float, axis: Vector3D): Quaternion {
             val halfAngle = angle / 2
-            val sinHalfAngle = acos(halfAngle)
+            val sinHalfAngle = sin(halfAngle)
             return Quaternion(
                 x = axis.x * sinHalfAngle,
                 y = axis.y * sinHalfAngle,
@@ -23,12 +29,15 @@ data class Quaternion(val x: Float, val y: Float, val z: Float, val w: Float) {
 
             val angle = acos(dotProduct / lengthProduct)
             val axis = Vector3D.getRotationAxis(from, to)
-            return angleAxis(angle, axis)
+            return if (axis == Vector3D.zero) {
+                identity
+            } else {
+                angleAxis(angle, axis)
+            }
         }
 
         fun lookRotation(localYDir: Vector3D, localXDir: Vector3D): Quaternion {
             val yAlignmentRotation = rotationQuaternion(Vector3D.up, localYDir)
-
             val inverseRotatedX = (yAlignmentRotation.inverse * localXDir).run {
                 this - this.dot(Vector3D.up) * Vector3D.up
             }
@@ -38,21 +47,42 @@ data class Quaternion(val x: Float, val y: Float, val z: Float, val w: Float) {
     }
 
     val inverse: Quaternion get () = Quaternion(-x, -y, -z, w)
+    val normalized: Quaternion get () {
+        val norm = sqrt(x * x + y * y + z * z + w * w)
+        return Quaternion(x / norm, y / norm, z / norm, w / norm)
+    }
     val eulerAngles: Vector3D get() {
-        val sinPitch = 2.0 * (w * x + y * z)
-        val cosPitch = 1.0 - 2.0 * (x * x + y * y)
+        val q = normalized
+        val sqw = q.w * q.w
+        val sqx = q.x * q.x
+        val sqy = q.y * q.y
+        val sqz = q.z * q.z
+        val unit = sqx + sqy + sqz + sqw
+        val test = q.x * q.w - q.y * q.z
 
-        val sinRoll = 2.0 * (w * z - x * y)
-        val cosRoll = 1.0 - 2.0 * (y * y + z * z)
+        if (test > 0.4995f * unit) {
+            return Vector3D(
+                y = 2f * atan2(q.y, q.x),
+                x = (PI / 2f).toFloat(),
+                z = 0f
+            ).toDegrees()
+        }
+        if (test < -0.4995f * unit) {
+            return Vector3D(
+                y = -2f * atan2(q.y, q.x),
+                x = (-PI / 2f).toFloat(),
+                z = 0f
+            ).toDegrees()
+        }
 
-        val sinYaw = 2.0 * (w * y + z * x)
-        val cosYaw = 1.0 - 2.0 * (x * x + y * y)
-
-        val pitch = atan2(sinPitch, cosPitch)
-        val roll = atan2(sinRoll, cosRoll)
-        val yaw = atan2(sinYaw, cosYaw)
-
-        return Vector3D(Math.toDegrees(yaw).toFloat(), Math.toDegrees(pitch).toFloat(), Math.toDegrees(roll).toFloat())
+        val rotatedQuaternion = Quaternion(q.w, q.z, q.x, q.y)
+        return Vector3D(
+            y = atan2(2f * rotatedQuaternion.x * rotatedQuaternion.w + 2f * rotatedQuaternion.y * rotatedQuaternion.z,
+            1 - 2f * (rotatedQuaternion.z * rotatedQuaternion.z + rotatedQuaternion.w * rotatedQuaternion.w)),
+            x = asin(2f * (rotatedQuaternion.x * rotatedQuaternion.z - rotatedQuaternion.w * rotatedQuaternion.y)),
+            z = atan2(2f * rotatedQuaternion.x * rotatedQuaternion.y + 2f * rotatedQuaternion.z * rotatedQuaternion.w,
+            1 - 2f * (rotatedQuaternion.y * rotatedQuaternion.y + rotatedQuaternion.z * rotatedQuaternion.z))
+        ).toDegrees()
     }
     operator fun times(q: Quaternion): Quaternion {
         val x = w * q.x + x * q.w + y * q.z - z * q.y
@@ -104,4 +134,35 @@ operator fun Vector3D.times(q: Quaternion): Vector3D {
     val z = (txz - twy) * this.x + (tyz + twx) * this.y + (1.0 - (txx + tyy)) * this.z
 
     return Vector3D(x.toFloat(), y.toFloat(), z.toFloat())
+}
+
+private fun Vector3D.toDegrees(): Vector3D {
+    return Vector3D(
+        x = (x / PI * 180).toFloat(),
+        y = (y / PI * 180).toFloat(),
+        z = (z / PI * 180).toFloat(),
+    ).makePositive()
+}
+
+private fun Vector3D.makePositive(): Vector3D {
+    val negativeFlip = Math.toDegrees(-0.0001)
+    val positiveFlip = 360.0f + negativeFlip
+
+    return Vector3D(
+        x = when {
+            x < negativeFlip -> x + 360.0f
+            x > positiveFlip -> x - 360.0f
+            else -> x
+        },
+        y = when {
+            y < negativeFlip -> y + 360.0f
+            y > positiveFlip -> y - 360.0f
+            else -> y
+        },
+        z = when {
+            z < negativeFlip -> z + 360.0f
+            z > positiveFlip -> z - 360.0f
+            else -> z
+        }
+    )
 }

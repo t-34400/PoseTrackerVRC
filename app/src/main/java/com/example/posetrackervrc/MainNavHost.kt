@@ -19,13 +19,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.posetrackervrc.ui.camera.CameraPoseEstimationScreen
+import com.example.posetrackervrc.ui.camera.PoseViewModel
 import com.example.posetrackervrc.ui.main.MainScreen
 import com.example.posetrackervrc.ui.video.VideoPoseEstimationScreen
+import com.example.posetrackervrc.viewmodel.UDPViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -37,7 +40,9 @@ import kotlinx.coroutines.launch
 fun MainNavHost(
     navController: NavHostController,
     modifier: Modifier,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    udpViewModel: UDPViewModel,
+    poseViewModel: PoseViewModel
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -91,7 +96,11 @@ fun MainNavHost(
             )
         }
         composable(route = CameraPoseEstimationDestinationProperties.route) {
-            CameraPoseEstimationScreen(modifier = Modifier.fillMaxSize())
+            CameraPoseEstimationScreen(
+                modifier = Modifier.fillMaxSize(),
+                udpViewModel = udpViewModel,
+                poseViewModel = poseViewModel
+            )
         }
         composable(route = VideoPoseEstimationDestinationProperties.route) {
             VideoPoseEstimationScreen()

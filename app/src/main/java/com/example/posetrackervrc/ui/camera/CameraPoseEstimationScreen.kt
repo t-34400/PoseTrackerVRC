@@ -1,5 +1,6 @@
 package com.example.posetrackervrc.ui.camera
 
+import android.util.Log
 import android.util.Size
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
@@ -13,8 +14,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -26,12 +29,15 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.posetrackervrc.data.osc.convertToOSCDatagrams
+import com.example.posetrackervrc.viewmodel.UDPViewModel
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.pose.Pose
 import com.google.mlkit.vision.pose.PoseDetection
 import com.google.mlkit.vision.pose.defaults.PoseDetectorOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 
 class PoseViewModel : ViewModel() {
@@ -43,8 +49,19 @@ class PoseViewModel : ViewModel() {
 
     private val _poseResult = mutableStateOf<Pose?>(null)
     private val _sourceImageSize = mutableStateOf(Size(1,1))
+    private val _shoulderWidth = mutableFloatStateOf(30f)
     val poseResult: State<Pose?> get() = _poseResult
     val sourceImageSize: State<Size> get() = _sourceImageSize
+    val shoulderWidth: State<Float> get() = _shoulderWidth
+
+    fun setShoulderWidth(length: Float) {
+        if (length <= 0.0f) {
+            return
+        }
+        viewModelScope.launch {
+            _shoulderWidth.floatValue = length
+        }
+    }
 
     @androidx.annotation.OptIn(ExperimentalGetImage::class)
     fun startPoseDetection(cameraController: CameraController) {
@@ -87,6 +104,7 @@ class PoseViewModel : ViewModel() {
 @Composable
 fun CameraPoseEstimationScreen(
     modifier: Modifier = Modifier,
+    udpViewModel: UDPViewModel = viewModel(),
     poseViewModel: PoseViewModel = viewModel()
 ) {
     val context = LocalContext.current
@@ -103,6 +121,16 @@ fun CameraPoseEstimationScreen(
     }
     LaunchedEffect(true) {
         poseViewModel.startPoseDetection(cameraController)
+    }
+    LaunchedEffect(pose) {
+        pose?.let { pose ->
+            withContext(Dispatchers.IO) {
+                val oscDatagrams = convertToOSCDatagrams(pose, poseViewModel.shoulderWidth.value / 100)
+                oscDatagrams.forEach { datagram ->
+                    udpViewModel.sendBinaryData(datagram)
+                }
+            }
+        }
     }
 
     Box(

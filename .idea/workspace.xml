@@ -9,16 +9,21 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="85354dc2-aaf6-4844-b5ec-8a4e98bd087e" name="Changes" comment="feat: Implement pose estimation feature from camera stream">
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/ui/components/SettingsDialog.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/ui/main/MainSettingsDialog.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/ui/udp/UDPSettingsComponent.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/viewmodel/UDPViewModel.kt" afterDir="false" />
+    <list default="true" id="85354dc2-aaf6-4844-b5ec-8a4e98bd087e" name="Changes" comment="feat: Implement OSC Packet Converter">
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/ui/camera/CameraSettingsDialog.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/MainActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/ui/main/MainScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/ui/main/MainScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/ui/topbar/MainTopBar.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/MainTopBar.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/MainNavHost.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/MainNavHost.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/MainTopBar.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/MainTopBar.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/data/Quaternion.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/data/Quaternion.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/data/Vector3D.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/data/Vector3D.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/ui/camera/CameraPoseEstimationScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/ui/camera/CameraPoseEstimationScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/ui/main/MainSettingsDialog.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/ui/main/MainSettingsDialog.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/ui/osc/OSCConverter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/data/osc/OSCConverter.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/ui/osc/PoseOSCPacketConverter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/data/osc/PoseOSCPacketConverter.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/viewmodel/UDPViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/viewmodel/UDPViewModel.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,6 +47,7 @@
         <option value="Kotlin Interface" />
         <option value="Kotlin Class" />
         <option value="Kotlin File" />
+        <option value="JUnit5 Test Class" />
       </list>
     </option>
   </component>
@@ -77,22 +83,34 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "com.google.services.firebase.aqiPopupShown": "true",
-    "last_opened_file_path": "C:/Users/81907/AndroidStudioProjects/compose-samples-main/Jetchat",
-    "settings.editor.selected.configurable": "memory.settings"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;com.google.services.firebase.aqiPopupShown&quot;: &quot;true&quot;,
+    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary&quot;: &quot;JUnit5&quot;,
+    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5&quot;: &quot;&quot;,
+    &quot;last_directory_selection&quot;: &quot;C:/Users/81907/AndroidStudioProjects/PoseTrackerVRC/app/src/test/java/com/example/posetrackervrc&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/81907/AndroidStudioProjects/PoseTrackerVRC/app/src/main/java/com/example/posetrackervrc/ui/camera&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;experimental&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\81907\AndroidStudioProjects\PoseTrackerVRC\app\src\main\java\com\example\posetrackervrc\ui\camera" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\81907\AndroidStudioProjects\PoseTrackerVRC\app\src\main\java\com\example\posetrackervrc" />
       <recent name="C:\Users\81907\AndroidStudioProjects\PoseTrackerVRC\app\src\main\java\com\example\posetrackervrc\ui\topbar" />
+    </key>
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
+    </key>
+    <key name="CreateTestDialog.RecentsKey">
+      <recent name="com.example.posetrackervrc.data" />
     </key>
   </component>
   <component name="RunManager" selected="Android App.app">
@@ -231,8 +249,58 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
+    <configuration name="QuaternionTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":app:testDebugUnitTest" />
+            <option value="--tests" />
+            <option value="&quot;com.example.posetrackervrc.data.QuaternionTest&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <ForceTestExec>true</ForceTestExec>
+      <method v="2" />
+    </configuration>
+    <configuration name="QuaternionTest.getEulerAngles" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":app:testDebugUnitTest" />
+            <option value="--tests" />
+            <option value="&quot;com.example.posetrackervrc.data.QuaternionTest.getEulerAngles&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <ForceTestExec>true</ForceTestExec>
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Gradle.QuaternionTest.getEulerAngles" />
+        <item itemvalue="Gradle.QuaternionTest" />
         <item itemvalue="Compose Preview.PoseTrackerVRCPreview" />
       </list>
     </recent_temporary>
@@ -281,7 +349,39 @@
       <option name="project" value="LOCAL" />
       <updated>1706370713314</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="feat: Implement UDPViewModel and UDPSettingsDialog">
+      <option name="closed" value="true" />
+      <created>1706419537134</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1706419537134</updated>
+    </task>
+    <task id="LOCAL-00006" summary="feat: Implement Vector3D data class">
+      <option name="closed" value="true" />
+      <created>1706464925245</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1706464925245</updated>
+    </task>
+    <task id="LOCAL-00007" summary="feat: Implement Quaternion data class">
+      <option name="closed" value="true" />
+      <created>1706467673367</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1706467673367</updated>
+    </task>
+    <task id="LOCAL-00008" summary="feat: Implement OSC Packet Converter">
+      <option name="closed" value="true" />
+      <created>1706472308594</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1706472308594</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -327,6 +427,10 @@
     <MESSAGE value="Implement main navigation." />
     <MESSAGE value="feat: Implement camera permission request" />
     <MESSAGE value="feat: Implement pose estimation feature from camera stream" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: Implement pose estimation feature from camera stream" />
+    <MESSAGE value="feat: Implement UDPViewModel and UDPSettingsDialog" />
+    <MESSAGE value="feat: Implement Vector3D data class" />
+    <MESSAGE value="feat: Implement Quaternion data class" />
+    <MESSAGE value="feat: Implement OSC Packet Converter" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: Implement OSC Packet Converter" />
   </component>
 </project>
