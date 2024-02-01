@@ -37,6 +37,16 @@ data class Vector3D(val x: Float, val y: Float, val z: Float) {
     operator fun times(multiplier: Float): Vector3D {
         return Vector3D(x * multiplier, y * multiplier, z * multiplier)
     }
+    operator fun times(multiplier: Int): Vector3D {
+        return Vector3D(x * multiplier, y * multiplier, z * multiplier)
+    }
+
+    operator fun div(divisor: Float): Vector3D {
+        return Vector3D(x / divisor, y / divisor, z / divisor)
+    }
+    operator fun div(divisor: Int): Vector3D {
+        return Vector3D(x / divisor, y / divisor, z / divisor)
+    }
 
     operator fun unaryMinus(): Vector3D {
         return Vector3D(-x, -y, -z)

@@ -9,104 +9,128 @@ import com.google.mlkit.vision.pose.Pose
 import com.google.mlkit.vision.pose.PoseLandmark
 import kotlin.math.sqrt
 
-fun convertToOSCDatagrams(pose: Pose, shoulderWidthMeters: Float): List<ByteArray> {
-    return pose.convertToRealCoordinates(shoulderWidthMeters)?.let { landmarks ->
-        val datagrams = mutableListOf<ByteArray>()
+data class PoseQueue(private val size: Int, private val validCountThreshold: Int, private val queue: ArrayDeque<Map<Int, Vector3D>?> = ArrayDeque()) {
+    fun add(pose: Map<Int, Vector3D>?) {
+        queue.add(pose)
+        while (queue.size > size) {
+            queue.removeFirstOrNull()
+        }
+    }
 
-        landmarks[PoseLandmark.LEFT_EYE]?.let { leftEye ->
-            landmarks[PoseLandmark.RIGHT_EYE]?.let { rightEye ->
-                val eyeMidpoint = (0.5f * (leftEye + rightEye)).also {
-                    datagrams.add(it.convertToOSC("/tracking/trackers/head/position"))
-                }
+    fun hasEnoughPose(): Boolean {
+        return queue.size >= validCountThreshold
+    }
 
-                landmarks[PoseLandmark.LEFT_MOUTH]?.let { leftMouth ->
-                    landmarks[PoseLandmark.RIGHT_MOUTH]?.let { rightMouth ->
-                        val mouthMidpoint = 0.5f * (leftMouth + rightMouth)
-
-                        val headDir = eyeMidpoint - mouthMidpoint
-                        val eyeDir = rightEye - leftEye
-                        val headRotation = Quaternion.lookRotation(headDir, eyeDir)
-                        datagrams.add(headRotation.eulerAngles.convertToOSC("/tracking/trackers/head/rotation"))
-                    }
-                }
-            }
+    operator fun get(landmarkIndex: Int): Vector3D? {
+        val validPoses = queue.filterNotNull().mapNotNull { landmarks -> landmarks[landmarkIndex] }
+        if (validPoses.count() < validCountThreshold) {
+            return null
         }
 
-
-        val leftAnkle = landmarks[PoseLandmark.LEFT_ANKLE]?.also {
-            datagrams.add(it.convertToOSC("/tracking/trackers/3/position"))
-        }
-        val rightAnkle = landmarks[PoseLandmark.RIGHT_ANKLE]?.also {
-            datagrams.add(it.convertToOSC("/tracking/trackers/4/position"))
-        }
-
-        landmarks[PoseLandmark.LEFT_KNEE]?.let { leftKnee ->
-            datagrams.add(leftKnee.convertToOSC("/tracking/trackers/5/position"))
-
-            leftAnkle?.let { leftAnkle ->
-                landmarks[PoseLandmark.LEFT_FOOT_INDEX]?.let { leftFootIndex ->
-                    val leftLegDir = leftAnkle - leftKnee
-                    val leftFootDir = leftFootIndex - leftAnkle
-                    val leftAnkleAxis = - leftLegDir.cross(leftFootDir)
-
-                    val footRotation = Quaternion.lookRotation(leftFootDir, leftAnkleAxis)
-                    datagrams.add(footRotation.eulerAngles.convertToOSC("/tracking/trackers/3/rotation"))
-
-                    val legRotation = Quaternion.lookRotation(leftLegDir, leftAnkle)
-                    datagrams.add(legRotation.eulerAngles.convertToOSC("/tracking/trackers/5/rotation"))
-                }
-            }
-        }
-
-        landmarks[PoseLandmark.RIGHT_KNEE]?.let { rightKnee ->
-            datagrams.add(rightKnee.convertToOSC("/tracking/trackers/6/position"))
-
-            rightAnkle?.let { rightAnkle ->
-                landmarks[PoseLandmark.RIGHT_FOOT_INDEX]?.let { rightFootIndex ->
-                    val rightLegDir = rightAnkle - rightKnee
-                    val rightFootDir = rightFootIndex - rightAnkle
-                    val rightAnkleAxis = - rightLegDir.cross(rightFootDir)
-
-                    val footRotation = Quaternion.lookRotation(rightFootDir, rightAnkleAxis)
-                    datagrams.add(footRotation.eulerAngles.convertToOSC("/tracking/trackers/4/rotation"))
-
-                    val legRotation = Quaternion.lookRotation(rightLegDir, rightAnkle)
-                    datagrams.add(legRotation.eulerAngles.convertToOSC("/tracking/trackers/6/rotation"))
-                }
-            }
-        }
-
-        landmarks[PoseLandmark.LEFT_ELBOW]?.let { leftElbow ->
-            datagrams.add(leftElbow.convertToOSC("/tracking/trackers/7/position"))
-
-            landmarks[PoseLandmark.LEFT_WRIST]?.let { leftWrist ->
-                landmarks[PoseLandmark.LEFT_THUMB]?.let { leftThumb ->
-                    val leftArmDir = leftWrist - leftElbow
-                    val leftThumbDir = leftThumb - leftWrist
-                    val rotation = Quaternion.lookRotation(leftArmDir, -leftThumbDir)
-                    datagrams.add(rotation.eulerAngles.convertToOSC("/tracking/trackers/7/rotation"))
-                }
-            }
-        }
-
-        landmarks[PoseLandmark.RIGHT_ELBOW]?.let { rightElbow ->
-            datagrams.add(rightElbow.convertToOSC("/tracking/trackers/8/position"))
-
-            landmarks[PoseLandmark.RIGHT_WRIST]?.let { rightWrist ->
-                landmarks[PoseLandmark.RIGHT_THUMB]?.let { rightThumb ->
-                    val rightArmDir = rightWrist - rightElbow
-                    val rightThumbDir = rightThumb - rightWrist
-                    val rotation = Quaternion.lookRotation(rightArmDir, rightThumbDir)
-                    datagrams.add(rotation.eulerAngles.convertToOSC("/tracking/trackers/8/rotation"))
-                }
-            }
-        }
-
-        return datagrams
-    } ?: listOf()
+        return validPoses.average()
+    }
 }
 
-private fun Pose.convertToRealCoordinates(
+fun convertToOSCDatagrams(poseQueue: PoseQueue): List<ByteArray> {
+    if (!poseQueue.hasEnoughPose()) {
+        return listOf()
+    }
+
+    val datagrams = mutableListOf<ByteArray>()
+
+    poseQueue[PoseLandmark.LEFT_EYE]?.let { leftEye ->
+        poseQueue[PoseLandmark.RIGHT_EYE]?.let { rightEye ->
+            val eyeMidpoint = (0.5f * (leftEye + rightEye)).also {
+                datagrams.add(it.convertToOSC("/tracking/trackers/head/position"))
+            }
+
+            poseQueue[PoseLandmark.LEFT_MOUTH]?.let { leftMouth ->
+                poseQueue[PoseLandmark.RIGHT_MOUTH]?.let { rightMouth ->
+                    val mouthMidpoint = 0.5f * (leftMouth + rightMouth)
+
+                    val headDir = eyeMidpoint - mouthMidpoint
+                    val eyeDir = rightEye - leftEye
+                    val headRotation = Quaternion.lookRotation(headDir, eyeDir)
+                    Log.d("PoseConvert", "L Mouth: ${leftMouth}\nR Mouth: ${rightMouth}\nL Eye: ${leftEye}\nR Eye: ${rightEye}\nHeadDir: ${headDir}\nEye dir: ${eyeDir}")
+                    datagrams.add(headRotation.eulerAngles.convertToOSC("/tracking/trackers/head/rotation"))
+                }
+            }
+        }
+    }
+
+    val leftAnkle = poseQueue[PoseLandmark.LEFT_ANKLE]?.also {
+        datagrams.add(it.convertToOSC("/tracking/trackers/3/position"))
+    }
+    val rightAnkle = poseQueue[PoseLandmark.RIGHT_ANKLE]?.also {
+        datagrams.add(it.convertToOSC("/tracking/trackers/4/position"))
+    }
+
+    poseQueue[PoseLandmark.LEFT_KNEE]?.let { leftKnee ->
+        datagrams.add(leftKnee.convertToOSC("/tracking/trackers/5/position"))
+
+        leftAnkle?.let { leftAnkle ->
+            poseQueue[PoseLandmark.LEFT_FOOT_INDEX]?.let { leftFootIndex ->
+                val leftLegDir = leftAnkle - leftKnee
+                val leftFootDir = leftFootIndex - leftAnkle
+                val leftAnkleAxis = - leftLegDir.cross(leftFootDir)
+
+                val footRotation = Quaternion.lookRotation(leftFootDir, leftAnkleAxis)
+                datagrams.add(footRotation.eulerAngles.convertToOSC("/tracking/trackers/3/rotation"))
+
+                val legRotation = Quaternion.lookRotation(leftLegDir, leftAnkle)
+                datagrams.add(legRotation.eulerAngles.convertToOSC("/tracking/trackers/5/rotation"))
+            }
+        }
+    }
+
+    poseQueue[PoseLandmark.RIGHT_KNEE]?.let { rightKnee ->
+        datagrams.add(rightKnee.convertToOSC("/tracking/trackers/6/position"))
+
+        rightAnkle?.let { rightAnkle ->
+            poseQueue[PoseLandmark.RIGHT_FOOT_INDEX]?.let { rightFootIndex ->
+                val rightLegDir = rightAnkle - rightKnee
+                val rightFootDir = rightFootIndex - rightAnkle
+                val rightAnkleAxis = - rightLegDir.cross(rightFootDir)
+
+                val footRotation = Quaternion.lookRotation(rightFootDir, rightAnkleAxis)
+                datagrams.add(footRotation.eulerAngles.convertToOSC("/tracking/trackers/4/rotation"))
+
+                val legRotation = Quaternion.lookRotation(rightLegDir, rightAnkle)
+                datagrams.add(legRotation.eulerAngles.convertToOSC("/tracking/trackers/6/rotation"))
+            }
+        }
+    }
+
+    poseQueue[PoseLandmark.LEFT_ELBOW]?.let { leftElbow ->
+        datagrams.add(leftElbow.convertToOSC("/tracking/trackers/7/position"))
+
+        poseQueue[PoseLandmark.LEFT_WRIST]?.let { leftWrist ->
+            poseQueue[PoseLandmark.LEFT_THUMB]?.let { leftThumb ->
+                val leftArmDir = leftWrist - leftElbow
+                val leftThumbDir = leftThumb - leftWrist
+                val rotation = Quaternion.lookRotation(leftArmDir, -leftThumbDir)
+                datagrams.add(rotation.eulerAngles.convertToOSC("/tracking/trackers/7/rotation"))
+            }
+        }
+    }
+
+    poseQueue[PoseLandmark.RIGHT_ELBOW]?.let { rightElbow ->
+        datagrams.add(rightElbow.convertToOSC("/tracking/trackers/8/position"))
+
+        poseQueue[PoseLandmark.RIGHT_WRIST]?.let { rightWrist ->
+            poseQueue[PoseLandmark.RIGHT_THUMB]?.let { rightThumb ->
+                val rightArmDir = rightWrist - rightElbow
+                val rightThumbDir = rightThumb - rightWrist
+                val rotation = Quaternion.lookRotation(rightArmDir, rightThumbDir)
+                datagrams.add(rotation.eulerAngles.convertToOSC("/tracking/trackers/8/rotation"))
+            }
+        }
+    }
+
+    return datagrams
+}
+
+fun Pose.convertToRealCoordinates(
     shoulderWidth: Float
 ): Map<Int, Vector3D>? {
     val _shoulderPixelWidth = this.getPoseLandmark(PoseLandmark.LEFT_SHOULDER)?.let { leftShoulder ->
@@ -132,7 +156,7 @@ private fun PointF3D.convertToRealCoordinates(
     return Vector3D(
         x = - x * pixelToRealRatio,
         y = y * pixelToRealRatio,
-        z = z * pixelToRealRatio
+        z = z * pixelToRealRatio * 0.3f
     )
 }
 
@@ -147,3 +171,11 @@ fun PointF3D.distance(pointF3D: PointF3D): Float {
     return sqrt(sqrDistance(pointF3D))
 }
 
+private fun Collection<Vector3D>.average(): Vector3D {
+    val size = this.size
+    var total = Vector3D(0f, 0f, 0f)
+    this.forEach {  vector ->
+        total += vector
+    }
+    return total / size
+}

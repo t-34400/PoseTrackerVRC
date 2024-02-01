@@ -1,6 +1,5 @@
 package com.example.posetrackervrc.ui.camera
 
-import android.util.Log
 import android.util.Size
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
@@ -17,7 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -29,7 +27,9 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.posetrackervrc.data.osc.PoseQueue
 import com.example.posetrackervrc.data.osc.convertToOSCDatagrams
+import com.example.posetrackervrc.data.osc.convertToRealCoordinates
 import com.example.posetrackervrc.viewmodel.UDPViewModel
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.pose.Pose
@@ -111,6 +111,12 @@ fun CameraPoseEstimationScreen(
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
     val pose by poseViewModel.poseResult
     val sourceImageSize by poseViewModel.sourceImageSize
+    val poseQueue = remember {
+        PoseQueue(
+            size = 10,
+            validCountThreshold = 8,
+        )
+    }
 
     val cameraController: CameraController = remember { LifecycleCameraController(context) }.apply {
         bindToLifecycle(lifecycleOwner)
@@ -123,12 +129,11 @@ fun CameraPoseEstimationScreen(
         poseViewModel.startPoseDetection(cameraController)
     }
     LaunchedEffect(pose) {
-        pose?.let { pose ->
-            withContext(Dispatchers.IO) {
-                val oscDatagrams = convertToOSCDatagrams(pose, poseViewModel.shoulderWidth.value / 100)
-                oscDatagrams.forEach { datagram ->
-                    udpViewModel.sendBinaryData(datagram)
-                }
+        poseQueue.add(pose?.convertToRealCoordinates(poseViewModel.shoulderWidth.value / 100))
+        withContext(Dispatchers.IO) {
+            val oscDatagrams = convertToOSCDatagrams(poseQueue)
+            oscDatagrams.forEach { datagram ->
+                udpViewModel.sendBinaryData(datagram)
             }
         }
     }

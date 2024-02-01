@@ -1,7 +1,6 @@
 package com.example.posetrackervrc.viewmodel
 
 import android.util.Log
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -10,7 +9,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.lang.Exception
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
@@ -20,7 +18,7 @@ class UDPViewModel : ViewModel() {
         val TAG = UDPViewModel::class.qualifiedName
     }
 
-    private val _remoteAddress = mutableStateOf("192.168.1.1")
+    private val _remoteAddress = mutableStateOf("192.168.2.108")
     private val _remotePort = mutableIntStateOf(9000)
     var remoteAddress: String by _remoteAddress
     var remotePort: Int by _remotePort
