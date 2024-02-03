@@ -12,8 +12,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -25,22 +25,42 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.posetrackervrc.VRChatOSCApplication
 import com.example.posetrackervrc.data.osc.PoseQueue
 import com.example.posetrackervrc.data.osc.convertToOSCDatagrams
 import com.example.posetrackervrc.data.osc.convertToRealCoordinates
+import com.example.posetrackervrc.data.repositories.PoseEstimationSettingsRepository
 import com.example.posetrackervrc.viewmodel.UDPViewModel
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.pose.Pose
 import com.google.mlkit.vision.pose.PoseDetection
 import com.google.mlkit.vision.pose.defaults.PoseDetectorOptions
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 
-class PoseViewModel : ViewModel() {
+class PoseViewModel(
+    private val poseEstimationSettingsRepository: PoseEstimationSettingsRepository
+) : ViewModel() {
+    companion object {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val application = (this[APPLICATION_KEY] as VRChatOSCApplication)
+                PoseViewModel(application.poseEstimationSettingsRepository)
+            }
+        }
+    }
+
     private val executor = Executors.newSingleThreadExecutor()
     private val options = PoseDetectorOptions.Builder()
         .setDetectorMode(PoseDetectorOptions.STREAM_MODE)
@@ -49,17 +69,29 @@ class PoseViewModel : ViewModel() {
 
     private val _poseResult = mutableStateOf<Pose?>(null)
     private val _sourceImageSize = mutableStateOf(Size(1,1))
-    private val _shoulderWidth = mutableFloatStateOf(30f)
     val poseResult: State<Pose?> get() = _poseResult
     val sourceImageSize: State<Size> get() = _sourceImageSize
-    val shoulderWidth: State<Float> get() = _shoulderWidth
+    val shoulderWidth: StateFlow<Float> =
+        poseEstimationSettingsRepository.shoulderWidth
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = 45.0f
+            )
+    val zAdjustmentFactor: StateFlow<Float> =
+        poseEstimationSettingsRepository.zAdjustmentFactor
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = 0.2f
+            )
 
-    fun setShoulderWidth(length: Float) {
-        if (length <= 0.0f) {
+    fun setPoseEstimationSettings(shoulderWidth: Float, zAdjustmentFactor: Float) {
+        if (shoulderWidth <= 0.0f) {
             return
         }
         viewModelScope.launch {
-            _shoulderWidth.floatValue = length
+            poseEstimationSettingsRepository.savePoseEstimationSettings(shoulderWidth, zAdjustmentFactor)
         }
     }
 
@@ -109,6 +141,10 @@ fun CameraPoseEstimationScreen(
 ) {
     val context = LocalContext.current
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
+
+    val shoulderWidth by poseViewModel.shoulderWidth.collectAsState()
+    val zAdjustmentFactor by poseViewModel.zAdjustmentFactor.collectAsState()
+
     val pose by poseViewModel.poseResult
     val sourceImageSize by poseViewModel.sourceImageSize
     val poseQueue = remember {
@@ -129,7 +165,7 @@ fun CameraPoseEstimationScreen(
         poseViewModel.startPoseDetection(cameraController)
     }
     LaunchedEffect(pose) {
-        poseQueue.add(pose?.convertToRealCoordinates(poseViewModel.shoulderWidth.value / 100))
+        poseQueue.add(pose?.convertToRealCoordinates(shoulderWidth / 100, zAdjustmentFactor))
         withContext(Dispatchers.IO) {
             val oscDatagrams = convertToOSCDatagrams(poseQueue)
             oscDatagrams.forEach { datagram ->

@@ -1,6 +1,5 @@
 package com.example.posetrackervrc.data.osc
 
-import android.util.Log
 import com.example.posetrackervrc.data.Quaternion
 import com.example.posetrackervrc.data.Vector3D
 import com.example.posetrackervrc.data.times
@@ -130,7 +129,8 @@ fun convertToOSCDatagrams(poseQueue: PoseQueue): List<ByteArray> {
 }
 
 fun Pose.convertToRealCoordinates(
-    shoulderWidth: Float
+    shoulderWidth: Float,
+    zAdjustmentFactor: Float
 ): Map<Int, Vector3D>? {
     val _shoulderPixelWidth = this.getPoseLandmark(PoseLandmark.LEFT_SHOULDER)?.let { leftShoulder ->
         this.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER)?.let { rightShoulder ->
@@ -144,18 +144,19 @@ fun Pose.convertToRealCoordinates(
         val pixelToRealRatio = shoulderWidth / shoulderPixelWidth
         this.allPoseLandmarks.associate { poseLandmark ->
             poseLandmark.landmarkType to
-                    poseLandmark.position3D.convertToRealCoordinates(pixelToRealRatio)
+                    poseLandmark.position3D.convertToRealCoordinates(pixelToRealRatio, zAdjustmentFactor)
         }
     }
 }
 
 private fun PointF3D.convertToRealCoordinates(
-    pixelToRealRatio: Float
+    pixelToRealRatio: Float,
+    zAdjustmentFactor: Float
 ): Vector3D {
     return Vector3D(
         x = - x * pixelToRealRatio,
         y = y * pixelToRealRatio,
-        z = z * pixelToRealRatio * 0.3f
+        z = z * pixelToRealRatio * zAdjustmentFactor
     )
 }
 

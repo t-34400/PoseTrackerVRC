@@ -20,7 +20,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.posetrackervrc.ui.components.SettingsDialog
 import com.example.posetrackervrc.ui.udp.UDPSettingsComponent
 import com.example.posetrackervrc.viewmodel.UDPViewModel
@@ -34,22 +33,26 @@ fun CameraSettingsDialog(
 ) {
     val remoteAddress by udpViewModel.remoteAddress.collectAsState()
     val remotePort by udpViewModel.remotePort.collectAsState()
+    val shoulderWidth by poseViewModel.shoulderWidth.collectAsState()
+    val zAdjustmentFactor by poseViewModel.zAdjustmentFactor.collectAsState()
 
     val remoteAddressInput = remember { mutableStateOf(remoteAddress) }
     val remotePortInput = remember { mutableStateOf(remotePort.toString()) }
-    val shoulderWidthInput = remember { mutableStateOf(poseViewModel.shoulderWidth.value.toString()) }
+    val shoulderWidthInput = remember { mutableStateOf(shoulderWidth.toString()) }
+    val zAdjustmentFactorInput = remember { mutableStateOf(zAdjustmentFactor.toString()) }
 
     SettingsDialog(
         modifier = modifier,
         title = "Settings",
         onDismissRequest = {
-            val port = remotePortInput.value.toIntOrNull() ?: udpViewModel.remotePort.value
+            val port = remotePortInput.value.toIntOrNull() ?: remotePort
             udpViewModel.updateRemoteClientInfo(
                 address = remoteAddressInput.value,
                 port = port
             )
-            val shoulderWidth = shoulderWidthInput.value.toFloatOrNull() ?: poseViewModel.shoulderWidth.value
-            poseViewModel.setShoulderWidth(shoulderWidth)
+            val newShoulderWidth = shoulderWidthInput.value.toFloatOrNull() ?: shoulderWidth
+            val newZAdjustmentFactor = zAdjustmentFactorInput.value.toFloatOrNull() ?: zAdjustmentFactor
+            poseViewModel.setPoseEstimationSettings(newShoulderWidth, newZAdjustmentFactor)
             onDismissRequest()
         }
     ) {
@@ -68,6 +71,10 @@ fun CameraSettingsDialog(
             shoulderWidth = shoulderWidthInput.value,
             onShoulderWidthChanged = { shoulderWidthString ->
                 shoulderWidthInput.value = shoulderWidthString
+            },
+            zAdjustmentFactor = zAdjustmentFactorInput.value,
+            onZAdjustmentFactorChanged = { zAdjustmentFactorString ->
+                zAdjustmentFactorInput.value = zAdjustmentFactorString
             }
         )
     }
@@ -78,6 +85,8 @@ fun PoseSettingsComponent(
     modifier: Modifier = Modifier,
     shoulderWidth: String,
     onShoulderWidthChanged: (String) -> Unit,
+    zAdjustmentFactor: String,
+    onZAdjustmentFactorChanged: (String) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -94,6 +103,26 @@ fun PoseSettingsComponent(
             label = { Text("Shoulder Width") },
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Next,
+                keyboardType = KeyboardType.Number
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = {
+                    focusManager.moveFocus(FocusDirection.Next)
+                }
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(64.dp)
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = zAdjustmentFactor,
+            onValueChange = onZAdjustmentFactorChanged,
+            label = { Text("Z Adjustment Factor") },
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Done,
                 keyboardType = KeyboardType.Number
             ),
             keyboardActions = KeyboardActions(
