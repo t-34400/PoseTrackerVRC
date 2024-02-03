@@ -51,7 +51,6 @@ fun convertToOSCDatagrams(poseQueue: PoseQueue): List<ByteArray> {
                     val headDir = eyeMidpoint - mouthMidpoint
                     val eyeDir = rightEye - leftEye
                     val headRotation = Quaternion.lookRotation(headDir, eyeDir)
-                    Log.d("PoseConvert", "L Mouth: ${leftMouth}\nR Mouth: ${rightMouth}\nL Eye: ${leftEye}\nR Eye: ${rightEye}\nHeadDir: ${headDir}\nEye dir: ${eyeDir}")
                     datagrams.add(headRotation.eulerAngles.convertToOSC("/tracking/trackers/head/rotation"))
                 }
             }

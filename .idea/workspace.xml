@@ -9,11 +9,17 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="85354dc2-aaf6-4844-b5ec-8a4e98bd087e" name="Changes" comment="fix: Improve user input processing">
+    <list default="true" id="85354dc2-aaf6-4844-b5ec-8a4e98bd087e" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/VRChatOSCApplication.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/data/repositories/UDPSettingsRepository.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/test/java/com/example/posetrackervrc/data/QuaternionTest.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/data/Vector3D.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/data/Vector3D.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/MainActivity.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/data/osc/PoseOSCPacketConverter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/data/osc/PoseOSCPacketConverter.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/ui/camera/CameraPoseEstimationScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/ui/camera/CameraPoseEstimationScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/ui/camera/CameraSettingsDialog.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/ui/camera/CameraSettingsDialog.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/ui/main/MainSettingsDialog.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/ui/main/MainSettingsDialog.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/viewmodel/UDPViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/posetrackervrc/viewmodel/UDPViewModel.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -36,9 +42,9 @@
       <list>
         <option value="navigationResourceFile" />
         <option value="Kotlin Interface" />
-        <option value="Kotlin Class" />
-        <option value="Kotlin File" />
         <option value="JUnit5 Test Class" />
+        <option value="Kotlin File" />
+        <option value="Kotlin Class" />
       </list>
     </option>
   </component>
@@ -293,6 +299,8 @@
         <item itemvalue="Gradle.QuaternionTest.getEulerAngles" />
         <item itemvalue="Gradle.QuaternionTest" />
         <item itemvalue="Compose Preview.PoseTrackerVRCPreview" />
+        <item itemvalue="Gradle.QuaternionTest.getEulerAngles" />
+        <item itemvalue="Gradle.QuaternionTest" />
       </list>
     </recent_temporary>
   </component>

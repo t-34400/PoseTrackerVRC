@@ -10,6 +10,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -26,19 +28,22 @@ import com.example.posetrackervrc.viewmodel.UDPViewModel
 @Composable
 fun CameraSettingsDialog(
     modifier: Modifier = Modifier,
-    udpViewModel: UDPViewModel = viewModel(),
-    poseViewModel: PoseViewModel = viewModel(),
+    udpViewModel: UDPViewModel,
+    poseViewModel: PoseViewModel,
     onDismissRequest: () -> Unit,
 ) {
-    val remoteAddressInput = remember { mutableStateOf(udpViewModel.remoteAddress) }
-    val remotePortInput = remember { mutableStateOf(udpViewModel.remotePort.toString()) }
+    val remoteAddress by udpViewModel.remoteAddress.collectAsState()
+    val remotePort by udpViewModel.remotePort.collectAsState()
+
+    val remoteAddressInput = remember { mutableStateOf(remoteAddress) }
+    val remotePortInput = remember { mutableStateOf(remotePort.toString()) }
     val shoulderWidthInput = remember { mutableStateOf(poseViewModel.shoulderWidth.value.toString()) }
 
     SettingsDialog(
         modifier = modifier,
         title = "Settings",
         onDismissRequest = {
-            val port = remotePortInput.value.toIntOrNull() ?: udpViewModel.remotePort
+            val port = remotePortInput.value.toIntOrNull() ?: udpViewModel.remotePort.value
             udpViewModel.updateRemoteClientInfo(
                 address = remoteAddressInput.value,
                 port = port

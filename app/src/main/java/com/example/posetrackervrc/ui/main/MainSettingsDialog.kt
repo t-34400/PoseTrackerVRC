@@ -1,7 +1,9 @@
 package com.example.posetrackervrc.ui.main
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -13,32 +15,42 @@ import com.example.posetrackervrc.viewmodel.UDPViewModel
 @Composable
 fun MainSettingsDialog(
     modifier: Modifier = Modifier,
-    udpViewModel: UDPViewModel = viewModel(),
+    udpViewModel: UDPViewModel,
     onDismissRequest: () -> Unit,
 ) {
-    val remoteAddress = remember { mutableStateOf(udpViewModel.remoteAddress) }
-    val remotePort = remember { mutableStateOf(udpViewModel.remotePort.toString()) }
+    val remoteAddress by udpViewModel.remoteAddress.collectAsState()
+    val remotePort by udpViewModel.remotePort.collectAsState()
+
+    val remoteAddressInput = remember { mutableStateOf(remoteAddress) }
+    val remotePortInput = remember { mutableStateOf(remotePort.toString()) }
+
+    LaunchedEffect (remoteAddress) {
+        remoteAddressInput.value = remoteAddress
+    }
+    LaunchedEffect (remotePort) {
+        remotePortInput.value = remotePort.toString()
+    }
 
     SettingsDialog(
         modifier = modifier,
         title = "Settings",
         onDismissRequest = {
-            val port = remotePort.value.toIntOrNull() ?: udpViewModel.remotePort
+            val port = remotePortInput.value.toIntOrNull() ?: udpViewModel.remotePort.value
             udpViewModel.updateRemoteClientInfo(
-                address = remoteAddress.value,
+                address = remoteAddressInput.value,
                 port = port
             )
             onDismissRequest()
         }
     ) {
         UDPSettingsComponent(
-            remoteAddress = remoteAddress.value,
+            remoteAddress = remoteAddressInput.value,
             onAddressChanged = { address ->
-                remoteAddress.value = address
+                remoteAddressInput.value = address
             },
-            remotePort = remotePort.value,
+            remotePort = remotePortInput.value,
             onPortChanged = { portString ->
-                remotePort.value = portString
+                remotePortInput.value = portString
             }
         )
     }

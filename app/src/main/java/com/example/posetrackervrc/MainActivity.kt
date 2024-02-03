@@ -11,6 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.posetrackervrc.ui.camera.PoseViewModel
@@ -34,7 +36,9 @@ class MainActivity : ComponentActivity() {
             val destinationProperties =
                 destinationPropertiesList.find { it.route == currentDestination?.route } ?: MainDestinationProperties
             val snackbarHostState = remember { SnackbarHostState() }
-            val udpViewModel = remember { UDPViewModel() }
+            val udpViewModel: UDPViewModel = viewModel(
+                factory = UDPViewModel.Factory
+            )
             val poseViewModel = remember { PoseViewModel() }
             Scaffold(
                 topBar = {

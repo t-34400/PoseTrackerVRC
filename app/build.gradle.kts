@@ -87,4 +87,6 @@ dependencies {
     implementation("com.google.mlkit:pose-detection:$pose_detection_version")
     implementation("com.google.mlkit:pose-detection-common:$pose_detection_version")
     implementation("com.google.mlkit:pose-detection-accurate:$pose_detection_version")
+
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 }
