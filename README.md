@@ -2,6 +2,9 @@
 
 This Android application performs pose estimation using the device's camera and simulates full-body tracking in VRChat by sending OSC (Open Sound Control) messages.
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CodeFactor](https://www.codefactor.io/repository/github/t-34400/posetrackervrc/badge)](https://www.codefactor.io/repository/github/t-34400/posetrackervrc)
+
 ## Prerequisites
 
 Before using the app, follow these steps:

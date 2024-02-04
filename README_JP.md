@@ -2,6 +2,9 @@
 
 このAndroidアプリケーションは、デバイスのカメラを使用してポーズ推定を行い、OSC（Open Sound Control）メッセージを使用してVRChatでフルボディトラッキングをシミュレートします。
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CodeFactor](https://www.codefactor.io/repository/github/t-34400/posetrackervrc/badge)](https://www.codefactor.io/repository/github/t-34400/posetrackervrc)
+
 ## 準備
 
 アプリを使用する前に、以下の手順に従ってください：
